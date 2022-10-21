@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from users.views import UserViewSet
+from users.views import UserViewSet, MeViewSet
 from .views import TitleViewSet, CategoryViewSet, GenreViewSet
 
 
@@ -22,11 +22,17 @@ router1.register(
     basename='genres',
 )
 router1.register(
+    'users/me',
+    MeViewSet,
+    basename='me'
+)
+router1.register(
     r'users',
     UserViewSet,
     basename='users',
 )
 
 urlpatterns = [
-    path('v1/', include(router1.urls))
+    path('v1/', include(router1.urls)),
+    path('v1/auth/', include('custom_auth.urls')),
 ]

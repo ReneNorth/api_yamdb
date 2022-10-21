@@ -54,6 +54,11 @@ class SignupSerializer(serializers.ModelSerializer):
 
         return user
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError("You not allowed to use this name. Choose another one!")
+        return value
+
 
 def get_confirmation_code(length):
     """Возвращает строку из случайных символов длиной length."""
