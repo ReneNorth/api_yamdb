@@ -29,9 +29,11 @@ class IsSuperUser(BasePermission):
 class TitleRoutePermission(BasePermission):
     """Доступ на чтение всем.
     Доступ к изменению объекта только админу или суперпользователю."""
+    def has_permission(self, request, view):
+        return (request.method in SAFE_METHODS
+                or request.user.is_authenticated)
+
     def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
-            return False
         if request.user.is_superuser or request.user.role == 'admin':
             return True
 
@@ -42,9 +44,13 @@ class ReviewsAndCommentsRoutePermission(BasePermission):
     Доступ к удалению и редактированию админам, модераторам,
     суперпользователям и авторам контента."""
 
+    def has_permission(self, request, view):
+        return (request.method in SAFE_METHODS
+                or request.user.is_authenticated)
+
     def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
-            return False
+        # if not request.user.is_authenticated:
+        #     return False
         # TODO: у obj (моделей Comments, Review) будет поле author?
         if request.method in ['UPDATE', 'DELETE'] and request.user != obj.author:
             return False
