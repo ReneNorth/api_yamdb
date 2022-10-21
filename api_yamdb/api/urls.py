@@ -25,7 +25,6 @@ router1.register(
     r'users',
     UserViewSet,
     basename='users',
-
 )
 
 urlpatterns = [

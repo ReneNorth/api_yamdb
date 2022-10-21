@@ -1,0 +1,20 @@
+###
+
+
+POST http://127.0.0.1:8000/v1/auth/signup/
+Content-Type: application/json
+
+{
+    "email": "komarovdemian@yandex.ru",
+    "username": "demian"
+}
+###
+
+
+POST http://127.0.0.1:8000/v1/auth/token/
+Content-Type: application/json
+
+{
+    "username": "demian",
+    "confirmation_code": "NOHFL55WFWSYUM595S0XWAM8NJIWG5"
+}
