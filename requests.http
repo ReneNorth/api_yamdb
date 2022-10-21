@@ -1,20 +1,32 @@
 ###
 
 
-POST http://127.0.0.1:8000/v1/auth/signup/
+POST http://127.0.0.1:8000/api/v1/auth/signup/
 Content-Type: application/json
 
 {
-    "email": "komarovdemian@yandex.ru",
-    "username": "demian"
+    "email": "kdemian@yandex.ru",
+    "username": "Demian"
 }
 ###
 
 
-POST http://127.0.0.1:8000/v1/auth/token/
+POST http://127.0.0.1:8000/api/v1/auth/token/
 Content-Type: application/json
 
 {
     "username": "demian",
     "confirmation_code": "NOHFL55WFWSYUM595S0XWAM8NJIWG5"
 }
+###
+
+POST http://127.0.0.1:8000/api/v1/genres/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY5ODI3MzczLCJpYXQiOjE2NjYzNzEzNzMsImp0aSI6IjNhMDZhYjIzNmExNTQ4MDM5ZjI3ZTZmZGYxNjVlZTg5IiwidXNlcl9pZCI6MX0.AztBEZkv56necfhqLvqoUz0bSrHIFr4pd6bgiJSkglk
+Content-Type: application/json
+
+{
+    "slug": "New genre",
+    "name": "Genre"
+}
+###
+

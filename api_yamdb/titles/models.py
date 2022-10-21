@@ -9,12 +9,16 @@ class Title(models.Model):
     )
     year = models.IntegerField(
     )
-    rating = models.IntegerField(
-    )
     description = models.TextField(
     )
     category = models.ForeignKey(
         'Category',
+        related_name='titles',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    genre = models.ForeignKey(
+        'Genre',
         related_name='titles',
         on_delete=models.SET_NULL,
         null=True,
@@ -30,8 +34,15 @@ class Category(models.Model):
         max_length=64,
         null=False,
     )
-    slug = models.SlugField(
-    )
+    slug = models.SlugField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['slug', 'name'],
+                name='unique category'
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.name
@@ -45,8 +56,11 @@ class Genre(models.Model):
     )
     slug = models.SlugField(
     )
-    # Not sure about it, but should work
-    title = models.ManyToManyField(
-        'Title',
-        related_name='genres',
-    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['slug', 'name'],
+                name='unique genre'
+            ),
+        ]

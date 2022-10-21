@@ -1,15 +1,12 @@
-import string
 import random
+import string
 
+from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
-
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.password_validation import validate_password
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from users.models import User
-
 
 # class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #
