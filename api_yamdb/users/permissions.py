@@ -1,92 +1,52 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAdminUser
 
 
-class IsModeratorPermission(BasePermission):
-    """Доступ к изменению контента только для автора контента."""
-    required_role = 'moderator'
-
+class IsSuperUser(BasePermission):
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS
+        return bool(request.user and request.user.is_superuser)
 
     def has_object_permission(self, request, view, obj):
-        if self.required_role is None:
-            return False
-        if request.user.role == self.required_role:
-            return True
-        return False
+        return bool(request.user and request.user.is_superuser)
 
 
-class OwnerOrReadOnly(BasePermission):
-
-    def has_permission(self, request, view):
-        return request.method in SAFE_METHODS
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in ['PATCH', 'DELETE']:
-            return obj.user == request.user
-        return True
-
-
-# class UserRolePermission(BasePermission):
-#     """Доступ к изменению контента только для автора контента."""
+# class IsAdminOrSuperuser(BasePermission):
+#     """Полный доступ ко всему толькоо для админов и суперпользователей.
+#     Подходит для моделей Categories, Genres."""
 #
 #     def has_permission(self, request, view):
-#         return (request.method in SAFE_METHODS
-#                 or request.user.is_authenticated)
-#
-#     def has_object_permission(self, request, view, obj):
-#         if request.method in SAFE_METHODS:
-#             return True
-#         return obj.author == request.user
-#
-#     def has_object_permission(self, request, view, obj):
-#         if request.method in ['PUT', 'PATCH', 'DELETE']:
-#             return obj.author == request.user
-#         if request.method == 'POST':
-#             return request.user.is_authenticated
-#         return True
-#
-#
-# def _is_fit_role(user, role_name):
-#     """
-#     Takes a user and a group name, and returns `True` if the user is in that group.
-#     """
-#     if user.role == role_name:
-#         return True
-#     return False
-#
-#
-# def _has_role_permission(user, required_groups):
-#     return any([_is_fit_role(user, group_name) for group_name in required_groups])
-#
-#
-# class IsLoggedInUserOrAdmin(BasePermission):
-#     # group_name for super admin
-#     required_groups = ['admin']
-#
-#     def has_object_permission(self, request, view, obj):
-#         has_role_permission = _has_role_permission(request.user, self.required_groups)
-#         if self.required_groups is None:
+#         if not request.user.is_authenticated:
 #             return False
-#         return obj == request.user or has_role_permission
-#
-#
-# class IsAdminUser(BasePermission):
-#     # group_name for super admin
-#     required_groups = ['admin']
-#
-#     def has_permission(self, request, view):
-#         has_role_permission = _has_role_permission(request.user, self.required_groups)
-#         return request.user and has_role_permission
+#         if request.user.is_superuser or request.user.role == 'admin':
+#             return True
 #
 #     def has_object_permission(self, request, view, obj):
-#         has_role_permission = _has_role_permission(request.user, self.required_groups)
-#         return request.user and has_role_permission
-#
-#
-# class IsAdminOrAnonymousUser(BasePermission):
-#     required_groups = ['admin', 'anonymous']
-#
-#     def has_permission(self, request, view):
-#         has_role_permission = _has_role_permission(request.user, self.required_groups)
-#         return request.user and has_role_permission
+#         if not request.user.is_authenticated:
+#             return False
+#         if request.user.is_superuser or request.user.role == 'admin':
+#             return True
+
+
+class TitleRoutePermission(BasePermission):
+    """Доступ на чтение всем.
+    Доступ к изменению объекта только админу или суперпользователю."""
+    def has_object_permission(self, request, view, obj):
+        if not request.user.is_authenticated:
+            return False
+        if request.user.is_superuser or request.user.role == 'admin':
+            return True
+
+
+class ReviewsAndCommentsRoutePermission(BasePermission):
+    """Доступ на чтение всем.
+    Доступ к созданию всем кроме не аутентифицированных пользователей.
+    Доступ к удалению и редактированию админам, модераторам,
+    суперпользователям и авторам контента."""
+
+    def has_object_permission(self, request, view, obj):
+        if not request.user.is_authenticated:
+            return False
+        # TODO: у obj (моделей Comments, Review) будет поле author?
+        if request.method in ['UPDATE', 'DELETE'] and request.user != obj.author:
+            return False
+
+        return True
