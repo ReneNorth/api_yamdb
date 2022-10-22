@@ -30,3 +30,12 @@ Content-Type: application/json
 }
 ###
 
+POST http://127.0.0.1:8000/api/v1/titles/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY5ODI3MzczLCJpYXQiOjE2NjYzNzEzNzMsImp0aSI6IjNhMDZhYjIzNmExNTQ4MDM5ZjI3ZTZmZGYxNjVlZTg5IiwidXNlcl9pZCI6MX0.AztBEZkv56necfhqLvqoUz0bSrHIFr4pd6bgiJSkglk
+Content-Type: application/json
+
+{
+    "name": "Movie",
+    "year": 2020,
+    "description": "Super movie",
+}

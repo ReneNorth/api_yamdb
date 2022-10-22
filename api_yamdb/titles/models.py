@@ -7,10 +7,8 @@ class Title(models.Model):
         max_length=64,
         null=False,
     )
-    year = models.IntegerField(
-    )
-    description = models.TextField(
-    )
+    year = models.IntegerField()
+    description = models.TextField()
     category = models.ForeignKey(
         'Category',
         related_name='titles',
