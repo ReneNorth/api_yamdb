@@ -7,23 +7,26 @@ class Title(models.Model):
         max_length=64,
         null=False,
     )
-    year = models.IntegerField()
-    description = models.TextField()
+    year = models.IntegerField(
+        null=False,
+    )
+    description = models.TextField(
+        null=True,
+    )
     category = models.ForeignKey(
         'Category',
         related_name='titles',
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         'Genre',
         related_name='titles',
-        on_delete=models.SET_NULL,
-        null=True,
     )
 
     def __str__(self) -> str:
-        return self.title
+        return self.name
 
 
 class Category(models.Model):
@@ -62,3 +65,6 @@ class Genre(models.Model):
                 name='unique genre'
             ),
         ]
+
+    def __str__(self):
+        return self.name

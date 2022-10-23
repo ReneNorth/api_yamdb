@@ -6,12 +6,14 @@ from rest_framework import mixins
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
+from django.shortcuts import get_object_or_404
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = (TitleRoutePermission,)
+    pagination_class = LimitOffsetPagination
 
 
 class CategoryViewSet(
@@ -20,10 +22,10 @@ class CategoryViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin
 ):
-    lookup_field = 'slug'
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (TitleRoutePermission,)
+    lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
