@@ -50,7 +50,12 @@ class TitleSerializer(serializers.ModelSerializer):
 
         return title
 
-        
+    def update(self, instance, validated_data):
+        if self.initial_data.get('category'):
+            instance.category = get_object_or_404(
+                Category, slug=self.initial_data.get('category')
+            )
+        return super().update(instance, validated_data)
 
     class Meta:
         fields = (

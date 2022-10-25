@@ -64,16 +64,24 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 GET http://127.0.0.1:8000/api/v1/titles/
 ###
 
-GET http://127.0.0.1:8000/api/v1/titles/30
+GET http://127.0.0.1:8000/api/v1/titles/29
 ###
 
-PATCH  http://127.0.0.1:8000/api/v1/titles/30/
+PATCH  http://127.0.0.1:8000/api/v1/titles/29/
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY5OTc4MzMxLCJpYXQiOjE2NjY1MjIzMzEsImp0aSI6ImY5ZjA2OWVlZGM1MzQzMjRiODQ5MDIxM2JkM2RkMDNkIiwidXNlcl9pZCI6Mn0.h65Cc62Vny9cClbhcClCMafs843RxiKgPOESybcjqJ8
 Content-Type: application/json
 
 {
-    "category": {
-        "name": "Songs",
-        "slug": "songs"
-    }
+    "category": "songs",
+    "year": 1999
 }
+###
+
+DELETE http://127.0.0.1:8000/api/v1/titles/29/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY5OTc4MzMxLCJpYXQiOjE2NjY1MjIzMzEsImp0aSI6ImY5ZjA2OWVlZGM1MzQzMjRiODQ5MDIxM2JkM2RkMDNkIiwidXNlcl9pZCI6Mn0.h65Cc62Vny9cClbhcClCMafs843RxiKgPOESybcjqJ8
+Content-Type: application/json
+###
+
+GET http://127.0.0.1:8000/api/v1/users
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY5OTc4MzMxLCJpYXQiOjE2NjY1MjIzMzEsImp0aSI6ImY5ZjA2OWVlZGM1MzQzMjRiODQ5MDIxM2JkM2RkMDNkIiwidXNlcl9pZCI6Mn0.h65Cc62Vny9cClbhcClCMafs843RxiKgPOESybcjqJ8
+Content-Type: application/json
