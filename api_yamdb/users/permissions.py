@@ -31,13 +31,22 @@ class TitleRoutePermission(BasePermission):
     Доступ к изменению объекта только админу или суперпользователю."""
     def has_permission(self, request, view):
         try:
-            return request.method in SAFE_METHODS or request.user.role == 'admin'
-        except Exception:
+            return (
+                request.method in SAFE_METHODS or request.user.role == 'admin'
+            )
+        except AttributeError:
             return False
 
     def has_object_permission(self, request, view, obj):
-        if request.user.is_superuser or request.user.role == 'admin':
-            return True
+        try:
+            if (
+                request.method == 'GET'
+                or request.user.is_superuser
+                or request.user.role == 'admin'
+            ):
+                return True
+        except AttributeError:
+            return False
 
 
 class ReviewsAndCommentsRoutePermission(BasePermission):

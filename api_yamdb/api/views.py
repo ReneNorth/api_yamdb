@@ -6,7 +6,6 @@ from rest_framework import mixins
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
-from django.shortcuts import get_object_or_404
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -14,6 +13,37 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (TitleRoutePermission,)
     pagination_class = LimitOffsetPagination
+    # filter_backends = (SearchFilter, DjangoFilterBackend)
+    # filter_fields = ('year', 'name',)
+    # search_fields = ('name',)
+    # filterset_class = TitleFilter
+
+    def get_queryset(self):
+        queryset = Title.objects.all().order_by('id')
+        category = self.request.query_params.get('category')
+        genre = self.request.query_params.get('genre')
+        name = self.request.query_params.get('name')
+        year = self.request.query_params.get('year')
+        if category is not None:
+            queryset = (
+                queryset.select_related('category')
+                .filter(category__slug=category)
+            )
+        if genre is not None:
+            queryset = (
+                queryset.select_related('category')
+                .filter(genre__slug=genre)
+            )
+        if name is not None:
+            queryset = (
+                queryset.filter(name__contains=name)
+            )
+        if year is not None:
+            queryset = (
+                queryset.filter(year=year)
+            )
+
+        return queryset
 
 
 class CategoryViewSet(
@@ -43,4 +73,4 @@ class GenreViewSet(
     lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
     filter_backends = (SearchFilter,)
-    search_fields = ('name',)
+    search_fields = ('name', 'slug')

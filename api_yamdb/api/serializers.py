@@ -29,25 +29,28 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(
-        many=True,
-        slug_field='slug',
-        queryset=Genre.objects.all(),
-    )
-    category = serializers.CharField()
+    genre = GenreSerializer(many=True, read_only=True,)
+    category = CategorySerializer(read_only=True)
 
     def create(self, validated_data):
-        raw_genres = validated_data.pop('genre')
-        category = validated_data.pop('category')
-
         title = Title.objects.create(
             **validated_data,
-            category=get_object_or_404(Category, slug=category),
+            category=get_object_or_404(
+                Category, slug=self.initial_data['category']
+            )
         )
-        for genre in raw_genres:
-            title.genre.add(genre)
+
+        try:
+            genre_slugs = self.initial_data.getlist('genre')
+        except Exception:
+            genre_slugs = self.initial_data.get('genre')
+
+        for slug in genre_slugs:
+            title.genre.add(get_object_or_404(Genre, slug=slug))
 
         return title
+
+        
 
     class Meta:
         fields = (
