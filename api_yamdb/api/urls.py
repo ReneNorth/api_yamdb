@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from users.views import MeViewSet, UserViewSet
+from users.views import UserViewSet
 
 from .views import CategoryViewSet, GenreViewSet, TitleViewSet
 
@@ -20,16 +20,22 @@ router1.register(
     GenreViewSet,
     basename='genres',
 )
-router1.register(
-    'users/me',
-    MeViewSet,
-    basename='me'
-)
+# router1.register(
+#     'users/me',
+#     MeViewSet,
+#     basename='me'
+# )
 router1.register(
     r'users',
     UserViewSet,
     basename='users',
 )
+
+# router1.register(
+#     r'users/(?P<username>\d+)',
+#     UsernameViewSet,
+#     basename='usernames',
+# )
 
 urlpatterns = [
     path('v1/', include(router1.urls)),
