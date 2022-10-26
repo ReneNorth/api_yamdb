@@ -1,7 +1,7 @@
-from rest_framework import serializers
-from titles.models import Category, Genre, Title
-from rest_framework.validators import UniqueValidator
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+from titles.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -63,3 +63,19 @@ class TitleSerializer(serializers.ModelSerializer):
             # 'rating',
         )
         model = Title
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
