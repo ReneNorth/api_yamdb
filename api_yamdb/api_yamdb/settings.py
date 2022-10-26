@@ -21,7 +21,7 @@ INSTALLED_APPS = [
     'custom_auth',
     'titles',
     'users',
-    'django_filters',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
