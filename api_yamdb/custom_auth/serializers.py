@@ -61,35 +61,31 @@ class SignupSerializer(serializers.ModelSerializer):
         if value == 'me' or len(User.objects.filter(username=value)) != 0:
             raise serializers.ValidationError("You not allowed to use this name. Choose another one!")
         return value
-    
+
     def validate_email(self, value):
         if User.objects.filter(email=value):
             raise serializers.ValidationError("You not allowed to use this email. Choose another one!")
         return value
-            
 
 
 def get_confirmation_code(length):
     """Возвращает строку из случайных символов длиной length."""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-
+    return ''.join(
+        random.choices(string.ascii_uppercase + string.digits, k=length)
+    )
 
 
 class ObtainTokenSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
-    
+
     def to_internal_value(self, data):
-        print('is it working?')
         username = data.get('username')
         confirmation_code = data.get('confirmation_code')
-        # user = get_object_or_404(User, username=username)
-        # print(user)
-        
+
         if not username:
-            print('in not username')
             raise serializers.ValidationError({
                 'username': 'This field is required.'
             })
@@ -99,3 +95,5 @@ class ObtainTokenSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'conf code': 'wrong cong code.'
             })
+
+        return data

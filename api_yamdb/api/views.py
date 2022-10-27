@@ -1,15 +1,14 @@
-from rest_framework import viewsets
-from titles.models import Category, Genre, Title, Review, Comment
-from users.permissions import TitleRoutePermission
-
-from rest_framework import mixins
+from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
-from .serializers import (CategorySerializer,
-                          GenreSerializer,
-                          TitleSerializer,
-                          ReviewSerializer,
-                          CommentSerializer)
+from titles.models import Category, Comment, Genre, Review, Title
+from users.permissions import TitleRoutePermission
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
+
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, TitleSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -17,10 +16,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (TitleRoutePermission,)
     pagination_class = LimitOffsetPagination
-    # filter_backends = (SearchFilter, DjangoFilterBackend)
-    # filter_fields = ('year', 'name',)
-    # search_fields = ('name',)
-    # filterset_class = TitleFilter
 
     def get_queryset(self):
         queryset = Title.objects.all().order_by('id')
@@ -51,10 +46,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(
-    viewsets.GenericViewSet,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin
+    viewsets.GenericViewSet, mixins.DestroyModelMixin,
+    mixins.ListModelMixin, mixins.CreateModelMixin
 ):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -77,19 +70,33 @@ class GenreViewSet(
     lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
     filter_backends = (SearchFilter,)
-<<<<<<< HEAD
     search_fields = ('name', 'slug')
-=======
-    search_fields = ('name',)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    
+    
+    def create(self, request, title_id):
+        # title_id = self.kwargs['title_id']
+        
+        # перенести эту проверку в сериализатор
+        if Review.objects.filter(author_id=self.request.user.pk, title_id=title_id).count() == 0:
+            serializer = ReviewSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(author_id=self.request.user.id, title_id=title_id)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+                
+                
+        
+
+
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     # permission_classes = (TitleRoutePermission,)
->>>>>>> CommentReview

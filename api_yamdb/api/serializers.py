@@ -2,6 +2,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from titles.models import Category, Comment, Genre, Review, Title
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from users.models import User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -66,16 +69,40 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
+    title = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'title', 'score', 'pub_date')
+        
+    # def validate(self, data):
+    #     title_id = self.context.get(
+    #         'request').parser_context.get('kwargs').get('title_id')
+    #     print(title_id, self.context['request'].user.pk)
+    #     print(len(Review.objects.filter(author_id=self.context['request'].user.pk, title_id=title_id)))
+    #     try:
+    #         if len(Review.objects.filter(
+    #             author_id=self.context['request'].user.pk,
+    #             title_id=title_id
+    #         )) > 0:
+    #             raise serializers.ValidationError('Одно ревью на '
+    #                                               'одно произведение!')
+    #     except Exception as er:
+    #         raise Exception(er)
+        
+    #     return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.SlugRelatedField(slug_field='username',
+                                          read_only=True)
 
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
+        extra_kwargs = {
+            'author': {'required': True},
+            'text': {'required': True},
+        }
+

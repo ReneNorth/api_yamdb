@@ -1,4 +1,8 @@
 from django.db import models
+# from users.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Title(models.Model):
@@ -65,24 +69,21 @@ class Genre(models.Model):
                 name='unique genre'
             ),
         ]
-<<<<<<< HEAD
 
-    def __str__(self):
-        return self.name
-=======
-        
     def __str__(self) -> str:
         return self.name
 
 
 class Review(models.Model):
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               related_name='reviews')
     text = models.TextField()
     score = models.PositiveSmallIntegerField(default=0)
     title = models.ForeignKey(
         Title,
         related_name='reviews',
-        on_delete=models.CASCADE,
-        null=True)
+        on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации'
@@ -91,26 +92,22 @@ class Review(models.Model):
     def __str__(self) -> str:
         return f'comment id: {self.id}, text: {self.text[:15]}'
     # добавить ограничение оцнека от 1 до 10
-    # дату автодобавление 
+    # дату автодобавление
     # название отображается неверно в админке
 
 
 class Comment(models.Model):
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               related_name='comments')
     text = models.TextField()
-    title = models.ForeignKey(
-        Title,
-        related_name='comments',
-        on_delete=models.CASCADE,
-        null=True)
-    review = models.ForeignKey(
-        Review,
-        related_name='comments',
-        on_delete=models.CASCADE,
-        null=True
-    )
-    pub_date = models.DateTimeField(
-        auto_now_add=True)
+    title = models.ForeignKey(Title,
+                              related_name='comments',
+                              on_delete=models.CASCADE)
+    review = models.ForeignKey(Review,
+                               related_name='comments',
+                               on_delete=models.CASCADE)
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f'comment id: {self.id}, text: {self.text[:15]}'
->>>>>>> CommentReview
