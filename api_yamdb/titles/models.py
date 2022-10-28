@@ -5,12 +5,12 @@ User = get_user_model()
 
 
 class Title(models.Model):
+    year = models.IntegerField(
+        null=False,
+    )
     name = models.CharField(
         'Название',
         max_length=64,
-        null=False,
-    )
-    year = models.IntegerField(
         null=False,
     )
     description = models.TextField(
