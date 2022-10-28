@@ -7,7 +7,8 @@ from ..models import Category, Genre, Title
 
 
 def genres():
-    with open('api_yamdb/static/data/genre.csv', encoding='utf-8') as file:
+    with open('api_yamdb/static/data/genre.csv',
+              encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
@@ -19,7 +20,8 @@ def genres():
 
 
 def users():
-    with open('api_yamdb/static/data/users.csv', encoding='utf-8') as file:
+    with open('api_yamdb/static/data/users.csv',
+              encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
@@ -36,7 +38,8 @@ def users():
 
 
 def titles():
-    with open('api_yamdb/static/data/titles.csv', encoding='utf-8') as file:
+    with open('api_yamdb/static/data/titles.csv',
+              encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
@@ -50,7 +53,8 @@ def titles():
 
 
 def categories():
-    with open('api_yamdb/static/data/category.csv', encoding='utf-8') as file:
+    with open('api_yamdb/static/data/category.csv',
+              encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
