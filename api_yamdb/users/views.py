@@ -12,7 +12,7 @@ from .serializers import UserSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [CreateListUsersPermission, IsAuthenticated]
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter, )

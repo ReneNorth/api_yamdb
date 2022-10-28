@@ -67,7 +67,8 @@ class ReviewsAndCommentsRoutePermission(BasePermission):
         #     return False
         # TODO: у obj (моделей Comments, Review) будет поле author?
         if (
-            request.method in ['UPDATE', 'DELETE']
+            request.method in ['UPDATE', 'DELETE', 'PATCH']
+            and request.user.role == 'user'
             and request.user != obj.author
         ):
             return False

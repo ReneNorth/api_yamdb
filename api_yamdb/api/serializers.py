@@ -1,10 +1,9 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
-from titles.models import Category, Comment, Genre, Review, Title
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
-from users.models import User
+from rest_framework.validators import UniqueValidator, ValidationError
+from reviews.models import Comment, Review
+from titles.models import Category, Genre, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -34,6 +33,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True,)
     category = CategorySerializer(read_only=True)
+    rating = serializers.SerializerMethodField()
 
     def create(self, validated_data):
         title = Title.objects.create(
@@ -62,36 +62,32 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category',
-            # 'rating',
+            'id', 'name', 'rating', 'year', 'description', 'genre', 'category'
         )
         model = Title
 
+    def get_rating(self, obj):
+        # hits DB for each object = needs refactoring
+        query_res = Review.objects.filter(title_id=obj.id)
+        if query_res.exists():
+            return int(query_res.aggregate(Avg('score'))['score__avg'])
+        return None
+
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
+    author = serializers.SlugRelatedField(slug_field='username',
+                                          read_only=True)
     title = serializers.PrimaryKeyRelatedField(read_only=True)
+    score = serializers.IntegerField(min_value=1, max_value=10)
 
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'title', 'score', 'pub_date')
-        
-    # def validate(self, data):
-    #     title_id = self.context.get(
-    #         'request').parser_context.get('kwargs').get('title_id')
-    #     print(title_id, self.context['request'].user.pk)
-    #     print(len(Review.objects.filter(author_id=self.context['request'].user.pk, title_id=title_id)))
-    #     try:
-    #         if len(Review.objects.filter(
-    #             author_id=self.context['request'].user.pk,
-    #             title_id=title_id
-    #         )) > 0:
-    #             raise serializers.ValidationError('Одно ревью на '
-    #                                               'одно произведение!')
-    #     except Exception as er:
-    #         raise Exception(er)
-        
-    #     return data
+
+    def validate_title(value):
+        if value < 1 or value > 10:
+            raise ValidationError('Оценка может быть только от 1 до 10')
+        return value
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -105,4 +101,3 @@ class CommentSerializer(serializers.ModelSerializer):
             'author': {'required': True},
             'text': {'required': True},
         }
-
