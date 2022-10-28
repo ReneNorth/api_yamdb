@@ -1,6 +1,5 @@
-from django.db import models
-# from users.models import User
 from django.contrib.auth import get_user_model
+from django.db import models
 
 User = get_user_model()
 
@@ -72,6 +71,3 @@ class Genre(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-
-

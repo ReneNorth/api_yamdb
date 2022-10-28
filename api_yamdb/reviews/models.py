@@ -1,7 +1,7 @@
-from django.db import models
-from titles.models import Title
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from titles.models import Title
 
 User = get_user_model()
 
@@ -26,12 +26,11 @@ class Review(models.Model):
         verbose_name = 'Рецензия'
         verbose_name_plural = 'Рецензии'
         unique_together = ('author', 'title',)
-        
-
-    
 
     def __str__(self) -> str:
-        return f'review id: {self.id}, text: {self.text[:15]}, rating: {self.score}'
+        return (f'review id: {self.id}, '
+                f'text: {self.text[:15]}, '
+                f'rating: {self.score}')
 
 
 class Comment(models.Model):
