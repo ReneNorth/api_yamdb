@@ -69,7 +69,6 @@ class TitleSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         """Рассчитывает средний рейтинг произведения и
         вовзращает значение в поле rating сериализатора."""
-        # hits DB for each object = needs refactoring
         query_res = Review.objects.filter(title_id=obj.id)
         if query_res.exists():
             return int(query_res.aggregate(Avg('score'))['score__avg'])

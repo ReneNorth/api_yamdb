@@ -63,11 +63,8 @@ class ReviewsAndCommentsRoutePermission(BasePermission):
                 or request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        # if not request.user.is_authenticated:
-        #     return False
-        # TODO: у obj (моделей Comments, Review) будет поле author?
         if (
-            request.method in ['UPDATE', 'DELETE', 'PATCH']
+            request.method in ['DELETE', 'PATCH', ]
             and request.user.role == 'user'
             and request.user != obj.author
         ):

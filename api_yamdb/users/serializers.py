@@ -10,8 +10,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role', )
-        extra_kwargs = {'role': {'read_only': True},
-                        'email': {'read_only': True}, }
         lookup_field = 'username'
         extra_kwargs = {
             'url': {'lookup_field': 'username'}

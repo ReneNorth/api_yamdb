@@ -9,8 +9,6 @@ CHOICES = (
 
 
 class User(AbstractUser):
-    # REQUIRED_FIELDS = ['username', 'email']
-
     email = models.EmailField(max_length=254, unique=True)
     bio = models.TextField(
         'Биография',
