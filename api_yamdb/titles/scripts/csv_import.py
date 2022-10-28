@@ -74,45 +74,9 @@ def set_genres():
             title.genre.add(genre)
 
 
-# def reviews():
-#     with open('api_yamdb/static/data/review.csv', encoding='utf-8') as file:
-#         reader = csv.reader(file)
-#         next(reader)
-#         for row in reader:
-
-
-#             Review.objects.get_or_create(
-#                 id=row[0],
-#                 title_id=row[1],
-#                 text=row[2],
-#                 author=row[3],
-#                 score=row[4],
-#                 pub_date=row[5],
-#             )
-
-
-# def comments():
-#     with open('api_yamdb/static/data/comments.csv', encoding='utf-8') as file:
-#         reader = csv.reader(file)
-#         next(reader)
-#         for row in reader:
-
-
-#             Comment.objects.get_or_create(
-#                 id=row[0],
-#                 review_id=row[1],
-#                 text=row[2],
-#                 author=row[3],
-#                 pub_date=row[4],
-
-#             )
-
-
 def run():
     users()
     genres()
     categories()
     titles()
     set_genres()
-    # reviews()
-    # comments()
