@@ -46,10 +46,15 @@ class TitleViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class CategoryViewSet(
-    viewsets.GenericViewSet, mixins.DestroyModelMixin,
-    mixins.ListModelMixin, mixins.CreateModelMixin
+class AbstractView(
+    viewsets.GenericViewSet,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin
 ):
+    pass
+
+class CategoryViewSet(AbstractView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (TitleRoutePermission,)
@@ -59,12 +64,7 @@ class CategoryViewSet(
     search_fields = ('name',)
 
 
-class GenreViewSet(
-    viewsets.GenericViewSet,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin
-):
+class GenreViewSet(AbstractView):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (TitleRoutePermission,)

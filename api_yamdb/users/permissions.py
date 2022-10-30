@@ -3,7 +3,6 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 class IsAdminUser(BasePermission):
     def has_permission(self, request, view):
-        print(request.user.role)
         return (request.user.is_authenticated
                 and request.user.role == 'admin')
 
