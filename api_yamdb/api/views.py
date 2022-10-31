@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
@@ -26,6 +27,10 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.request.method in ('GET', 'RETRIEVE', 'LIST',):
             return TitleRetriveSerializer
         return TitleCreateSerializer
+
+    def get_queryset(self):
+        return Title.objects.all().annotate(
+            rating=Avg('reviews__score')).order_by('id')
 
 
 class AbstractView(

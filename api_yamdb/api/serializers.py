@@ -46,10 +46,11 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 class TitleRetriveSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True,)
     category = CategorySerializer()
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'description', 'genre', 'category', 'rating'
         )
         model = Title
 
