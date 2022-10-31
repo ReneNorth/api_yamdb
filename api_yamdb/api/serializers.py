@@ -1,5 +1,3 @@
-from django.db.models import Avg
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator, ValidationError
 from reviews.models import Comment, Review
@@ -30,49 +28,30 @@ class GenreSerializer(serializers.ModelSerializer):
         extra_kwargs = {'url': {'lookup_field': 'slug'}}
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True, read_only=True,)
-    category = CategorySerializer(read_only=True)
-    rating = serializers.SerializerMethodField()
-
-    def create(self, validated_data):
-        title = Title.objects.create(
-            **validated_data,
-            category=get_object_or_404(
-                Category, slug=self.initial_data['category']
-            )
-        )
-
-        try:
-            genre_slugs = self.initial_data.getlist('genre')
-        except Exception:
-            genre_slugs = self.initial_data.get('genre')
-
-        for slug in genre_slugs:
-            title.genre.add(get_object_or_404(Genre, slug=slug))
-
-        return title
-
-    def update(self, instance, validated_data):
-        if self.initial_data.get('category'):
-            instance.category = get_object_or_404(
-                Category, slug=self.initial_data.get('category')
-            )
-        return super().update(instance, validated_data)
+class TitleCreateSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', many=True, queryset=Genre.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all()
+    )
 
     class Meta:
         fields = (
-            'id', 'name', 'rating', 'year', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'description', 'genre', 'category'
         )
         model = Title
 
-    def get_rating(self, obj):
-        """Рассчитывает средний рейтинг произведения и
-        вовзращает значение в поле rating сериализатора."""
-        query_res = Review.objects.filter(title_id=obj.id)
-        if query_res.exists():
-            return int(query_res.aggregate(Avg('score'))['score__avg'])
-        return None
+
+class TitleRetriveSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True,)
+    category = CategorySerializer()
+
+    class Meta:
+        fields = (
+            'id', 'name', 'year', 'description', 'genre', 'category'
+        )
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
