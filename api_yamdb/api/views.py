@@ -1,4 +1,6 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
@@ -8,48 +10,39 @@ from titles.models import Category, Genre, Title
 from users.permissions import (ReviewsAndCommentsRoutePermission,
                                TitleRoutePermission)
 
+from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, TitleSerializer)
+                          GenreSerializer, ReviewSerializer,
+                          TitleCreateSerializer, TitleRetriveSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
     permission_classes = (TitleRoutePermission,)
     pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.request.method in ('GET', 'RETRIEVE', 'LIST',):
+            return TitleRetriveSerializer
+        return TitleCreateSerializer
 
     def get_queryset(self):
-        queryset = Title.objects.all().order_by('id')
-        category = self.request.query_params.get('category')
-        genre = self.request.query_params.get('genre')
-        name = self.request.query_params.get('name')
-        year = self.request.query_params.get('year')
-        if category is not None:
-            queryset = (
-                queryset.select_related('category')
-                .filter(category__slug=category)
-            )
-        if genre is not None:
-            queryset = (
-                queryset.select_related('category')
-                .filter(genre__slug=genre)
-            )
-        if name is not None:
-            queryset = (
-                queryset.filter(name__contains=name)
-            )
-        if year is not None:
-            queryset = (
-                queryset.filter(year=year)
-            )
-
-        return queryset
+        return Title.objects.all().annotate(
+            rating=Avg('reviews__score')).order_by('id')
 
 
-class CategoryViewSet(
-    viewsets.GenericViewSet, mixins.DestroyModelMixin,
-    mixins.ListModelMixin, mixins.CreateModelMixin
+class AbstractView(
+    viewsets.GenericViewSet,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin
 ):
+    pass
+
+
+class CategoryViewSet(AbstractView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (TitleRoutePermission,)
@@ -59,12 +52,7 @@ class CategoryViewSet(
     search_fields = ('name',)
 
 
-class GenreViewSet(
-    viewsets.GenericViewSet,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin
-):
+class GenreViewSet(AbstractView):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (TitleRoutePermission,)

@@ -1,12 +1,20 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator
 from django.db import models
 
 User = get_user_model()
 
 
 class Title(models.Model):
-    year = models.IntegerField(
+    year = models.PositiveSmallIntegerField(
         null=False,
+        validators=(
+            MaxValueValidator(
+                datetime.now().year
+            ),
+        )
     )
     name = models.CharField(
         'Название',

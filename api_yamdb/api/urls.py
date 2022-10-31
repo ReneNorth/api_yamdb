@@ -7,23 +7,23 @@ from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
 
 router1 = routers.SimpleRouter()
 router1.register(
-    r'titles',
+    'titles',
     TitleViewSet,
     basename='titles',
 )
 router1.register(
-    r'categories',
+    'categories',
     CategoryViewSet,
     basename='categories',
 )
 router1.register(
-    r'genres',
+    'genres',
     GenreViewSet,
     basename='genres',
 )
 
 router1.register(
-    r'users',
+    'users',
     UserViewSet,
     basename='users',
 )

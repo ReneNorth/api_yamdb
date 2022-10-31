@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'users',
     'reviews',
     'django_extensions',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
