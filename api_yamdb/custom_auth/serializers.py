@@ -7,8 +7,10 @@ from rest_framework import serializers
 from users.models import User
 
 
+CODE_LEN = 30
+
+
 class SignupSerializer(serializers.ModelSerializer):
-    code_len = 30
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
 
@@ -23,7 +25,7 @@ class SignupSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
-            confirmation_code=get_confirmation_code(self.code_len)
+            confirmation_code=get_confirmation_code(CODE_LEN)
         )
         user.save()
 
@@ -38,7 +40,7 @@ class SignupSerializer(serializers.ModelSerializer):
         return user
 
     def validate_username(self, value):
-        if value == 'me' or len(User.objects.filter(username=value)) != 0:
+        if value == 'me' or User.objects.filter(username=value).exists():
             raise serializers.ValidationError('Это имя занято.'
                                               'Пожалуйста, выберите другое')
         return value

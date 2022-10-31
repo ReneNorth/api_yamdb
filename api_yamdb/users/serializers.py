@@ -16,7 +16,8 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def validate_role(self, value):
+        # TODO: что за проверка?
         if (value == ('admin' or 'moderator')
-           and (get_object_or_404(User, pk=self.instance.pk).role == 'user')):
+           and get_object_or_404(User, pk=self.instance.pk).is_user):
             return 'user'
         return value

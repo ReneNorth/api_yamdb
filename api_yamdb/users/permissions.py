@@ -3,15 +3,14 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 class IsAdminUser(BasePermission):
     def has_permission(self, request, view):
-        print(request.user.role)
         return (request.user.is_authenticated
-                and request.user.role == 'admin')
+                and request.user.is_user)
 
 
 class CreateListUsersPermission(BasePermission):
     def has_permission(self, request, view):
         return (request.user.is_authenticated
-                and request.user.role == 'admin'
+                and request.user.is_admin
                 or request.user.is_superuser
                 or request.user.is_staff)
 
@@ -35,7 +34,7 @@ class TitleRoutePermission(BasePermission):
     def has_permission(self, request, view):
         try:
             return (
-                request.method in SAFE_METHODS or request.user.role == 'admin'
+                request.method in SAFE_METHODS or request.user.is_admin
             )
         except AttributeError:
             return False
@@ -45,7 +44,7 @@ class TitleRoutePermission(BasePermission):
             if (
                 request.method == 'GET'
                 or request.user.is_superuser
-                or request.user.role == 'admin'
+                or request.user.is_admin
             ):
                 return True
         except AttributeError:
@@ -65,7 +64,7 @@ class ReviewsAndCommentsRoutePermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if (
             request.method in ['DELETE', 'PATCH', ]
-            and request.user.role == 'user'
+            and request.user.is_user
             and request.user != obj.author
         ):
             return False
