@@ -20,7 +20,9 @@ class User(AbstractUser):
         'Биография',
         blank=True,
     )
-    role = models.CharField(choices=CustomUser.CHOICES, default='user', max_length=128)
+    role = models.CharField(choices=CustomUser.CHOICES,
+                            default='user',
+                            max_length=128)
     confirmation_code = models.CharField(max_length=30)
 
     class Meta:
