@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator, ValidationError
 from reviews.models import Comment, Review
@@ -64,11 +65,25 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'title', 'score', 'pub_date')
+        extra_kwargs = {
+            'score': {'required': True},
+            'text': {'required': True},
+        }
 
-    def validate_title(value):
+    def validate_score(self, value):
         if value < 1 or value > 10:
             raise ValidationError('Оценка может быть только от 1 до 10')
         return value
+
+    def validate(self, data):
+        if self.context['request'].method != 'PATCH':
+            title_id = self.context[
+                'request'].parser_context['kwargs']['title_id']
+            get_object_or_404(Title, id=title_id)
+            if Review.objects.filter(author_id=self.context['request'].user.pk,
+                                     title_id=title_id).exists():
+                raise ValidationError('Одно ревью на пользователя')
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -82,3 +97,11 @@ class CommentSerializer(serializers.ModelSerializer):
             'author': {'required': True},
             'text': {'required': True},
         }
+
+    def validate(self, data):
+        title_id = self.context['request'].parser_context['kwargs']['title_id']
+        review_id = self.context[
+            'request'].parser_context['kwargs']['review_id']
+
+        get_object_or_404(Review, id=review_id, title_id=title_id)
+        return data

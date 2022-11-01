@@ -9,11 +9,13 @@ User = get_user_model()
 class Review(models.Model):
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
-                               related_name='reviews')
+                               related_name='author')
     text = models.TextField()
-    score = models.PositiveSmallIntegerField(default=5,
-                                             validators=[MaxValueValidator(10),
-                                                         MinValueValidator(1)])
+    score = models.PositiveSmallIntegerField(
+        default=5,
+        validators=[MaxValueValidator(10, 'Оценка должна быть от 1 до 10'),
+                    MinValueValidator(1, 'Оценка должна быть от 1 до 10')]
+    )
     title = models.ForeignKey(Title,
                               related_name='reviews',
                               on_delete=models.CASCADE)
@@ -26,6 +28,7 @@ class Review(models.Model):
         verbose_name = 'Рецензия'
         verbose_name_plural = 'Рецензии'
         unique_together = ('author', 'title',)
+        ordering = ['id']
 
     def __str__(self) -> str:
         return (f'review id: {self.id}, '
@@ -45,6 +48,9 @@ class Comment(models.Model):
                                related_name='comments',
                                on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-pub_date']
 
     def __str__(self) -> str:
         return f'comment id: {self.id}, text: {self.text[:15]}'

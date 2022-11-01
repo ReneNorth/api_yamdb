@@ -36,6 +36,9 @@ class Title(models.Model):
         related_name='titles',
     )
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self) -> str:
         return self.name
 
@@ -49,6 +52,7 @@ class Category(models.Model):
     slug = models.SlugField()
 
     class Meta:
+        ordering = ['id']
         constraints = [
             models.UniqueConstraint(
                 fields=['slug', 'name'],
@@ -70,6 +74,7 @@ class Genre(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         constraints = [
             models.UniqueConstraint(
                 fields=['slug', 'name'],
