@@ -11,7 +11,7 @@ from users.permissions import (ReviewsAndCommentsRoutePermission,
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleCreateSerializer, TitleRetriveSerializer)
+                          TitleCreateSerializer, TitleRetrieveSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -22,8 +22,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
-        if self.request.method in ('GET', 'RETRIEVE', 'LIST',):
-            return TitleRetriveSerializer
+        if self.action in ('retrieve', 'list',):
+            return TitleRetrieveSerializer
         return TitleCreateSerializer
 
     def get_queryset(self):
