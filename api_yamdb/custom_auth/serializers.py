@@ -45,7 +45,7 @@ class SignupSerializer(serializers.ModelSerializer):
         return value
 
     def validate_email(self, value):
-        if User.objects.filter(email=value):
+        if User.objects.filter(email=value).exists():
             raise serializers.ValidationError('Эта почта занята.'
                                               'Пожалуйста, выберите другую')
         return value

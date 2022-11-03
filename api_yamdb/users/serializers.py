@@ -16,7 +16,10 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def validate_role(self, value):
-        # TODO: что за проверка?
+        """Проверка роли, которую указал пользователь.
+        В случае, если пользователь с ролью user прописал роль
+        admin или moderator, принудительно устанавливаем роль user,
+        иначе устанавливаем роль из переданной переменной."""
         if (value == ('admin' or 'moderator')
            and get_object_or_404(User, pk=self.instance.pk).is_user):
             return 'user'
