@@ -108,5 +108,5 @@ class CommentSerializer(serializers.ModelSerializer):
         try:
             Review.objects.get(id=review_id, title_id=title_id)
         except ObjectDoesNotExist:
-            raise ValidationError('Такого ревью не существует')
+            raise NotFound('Такого ревью не существует')
         return data
