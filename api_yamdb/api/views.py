@@ -1,19 +1,18 @@
 from django.db.models import Avg
+from django.core.exceptions import ObjectDoesNotExist
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
+from rest_framework.exceptions import NotFound
 from users.permissions import (ReviewsAndCommentsRoutePermission,
                                TitleRoutePermission)
-
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleCreateSerializer, TitleRetrieveSerializer)
-
-from django.shortcuts import get_object_or_404
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -72,7 +71,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title__id=self.kwargs['title_id'])
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        try:
+            title = Title.objects.get(id=self.kwargs['title_id'])
+        except ObjectDoesNotExist as er:
+            raise NotFound(f'такого объекта title не существует! '
+                           f'Ошибка {er}')
         serializer.save(author=self.request.user,
                         title=title)
 
@@ -88,8 +91,11 @@ class CommentViewSet(viewsets.ModelViewSet):
             review_id=self.kwargs['review_id'])
 
     def perform_create(self, serializer):
-        serializer.save(author_id=self.request.user.id,
-                        title_id=self.request.parser_context[
-                            'kwargs']['title_id'],
-                        review_id=self.request.parser_context[
-                            'kwargs']['review_id'])
+        try:
+            title = Title.objects.get(id=self.kwargs['title_id'])
+            review = Review.objects.get(id=self.kwargs['review_id'])
+        except ObjectDoesNotExist as er:
+            raise NotFound(f'такого объекта не существует! Ошибка {er}')
+        serializer.save(author=self.request.user,
+                        title=title,
+                        review=review)

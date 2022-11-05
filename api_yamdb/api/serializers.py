@@ -64,7 +64,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'title', 'score', 'pub_date')
-        read_only_fields = ['author', 'title']
+        read_only_fields = ['author', 'title', 'id']
         extra_kwargs = {
             'score': {'required': True},
             'text': {'required': True},
@@ -108,5 +108,5 @@ class CommentSerializer(serializers.ModelSerializer):
         try:
             Review.objects.get(id=review_id, title_id=title_id)
         except ObjectDoesNotExist:
-            raise NotFound('Такого ревью не существует')
+            raise ValidationError('Такого ревью не существует')
         return data
