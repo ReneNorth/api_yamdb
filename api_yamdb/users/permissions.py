@@ -63,5 +63,4 @@ class ReviewsAndCommentsRoutePermission(BasePermission):
                 and request.user != obj.author
         ):
             return False
-
         return True

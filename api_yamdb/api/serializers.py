@@ -1,8 +1,9 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator, ValidationError
+from rest_framework.exceptions import NotFound
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -59,12 +60,11 @@ class TitleRetrieveSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
-    title = serializers.PrimaryKeyRelatedField(read_only=True)
-    score = serializers.IntegerField(min_value=1, max_value=10)
 
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'title', 'score', 'pub_date')
+        read_only_fields = ['author', 'title']
         extra_kwargs = {
             'score': {'required': True},
             'text': {'required': True},
@@ -76,12 +76,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        if self.context['request'].method != 'PATCH':
+        if self.context['request'].method == 'POST':
             title_id = self.context[
                 'request'].parser_context['kwargs']['title_id']
-            get_object_or_404(Title, id=title_id)
-            if Review.objects.filter(author_id=self.context['request'].user.pk,
-                                     title_id=title_id).exists():
+            try:
+                Title.objects.get(id=title_id)
+            except ObjectDoesNotExist:
+                raise NotFound('Такого произведения не существует')
+            if Review.objects.filter(author=self.context['request'].user,
+                                     title__id=title_id).exists():
                 raise ValidationError('Одно ревью на пользователя')
         return data
 
@@ -102,6 +105,8 @@ class CommentSerializer(serializers.ModelSerializer):
         title_id = self.context['request'].parser_context['kwargs']['title_id']
         review_id = self.context[
             'request'].parser_context['kwargs']['review_id']
-
-        get_object_or_404(Review, id=review_id, title_id=title_id)
+        try:
+            Review.objects.get(id=review_id, title_id=title_id)
+        except ObjectDoesNotExist:
+            raise NotFound('Такого ревью не существует')
         return data

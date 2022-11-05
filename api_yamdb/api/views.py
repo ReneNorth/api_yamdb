@@ -13,6 +13,8 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleCreateSerializer, TitleRetrieveSerializer)
 
+from django.shortcuts import get_object_or_404
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
@@ -20,6 +22,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+    ordering_fields = ['id', ]
 
     def get_serializer_class(self):
         if self.action in ('retrieve', 'list',):
@@ -28,7 +31,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Title.objects.all().annotate(
-            rating=Avg('reviews__score')).order_by('id')
+            rating=Avg('reviews__score'))
 
 
 class AbstractView(
@@ -66,12 +69,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Review.objects.filter(
-            title_id=self.kwargs['title_id'])
+            title__id=self.kwargs['title_id'])
 
     def perform_create(self, serializer):
-        serializer.save(author_id=self.request.user.id,
-                        title_id=self.request.parser_context[
-                            'kwargs']['title_id'])
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        serializer.save(author=self.request.user,
+                        title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
