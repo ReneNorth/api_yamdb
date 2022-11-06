@@ -79,10 +79,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         if self.context['request'].method == 'POST':
             title_id = self.context[
                 'request'].parser_context['kwargs']['title_id']
-            try:
-                Title.objects.get(id=title_id)
-            except ObjectDoesNotExist:
-                raise NotFound('Такого произведения не существует')
             if Review.objects.filter(author=self.context['request'].user,
                                      title__id=title_id).exists():
                 raise ValidationError('Одно ревью на пользователя')
@@ -105,8 +101,6 @@ class CommentSerializer(serializers.ModelSerializer):
         title_id = self.context['request'].parser_context['kwargs']['title_id']
         review_id = self.context[
             'request'].parser_context['kwargs']['review_id']
-        try:
-            Review.objects.get(id=review_id, title_id=title_id)
-        except ObjectDoesNotExist:
-            raise NotFound('Такого ревью не существует')
-        return data
+        if Review.objects.filter(id=review_id, title_id=title_id).exists():
+            return data
+        raise NotFound('Такого title или ревью не существует')

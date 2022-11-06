@@ -10,13 +10,13 @@ from rest_framework.exceptions import NotFound
 from users.permissions import (ReviewsAndCommentsRoutePermission,
                                TitleRoutePermission)
 from .filters import TitleFilter
+from django.shortcuts import get_object_or_404
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleCreateSerializer, TitleRetrieveSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
     permission_classes = (TitleRoutePermission,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
@@ -71,11 +71,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title__id=self.kwargs['title_id'])
 
     def perform_create(self, serializer):
-        try:
-            title = Title.objects.get(id=self.kwargs['title_id'])
-        except ObjectDoesNotExist as er:
-            raise NotFound(f'такого объекта title не существует! '
-                           f'Ошибка {er}')
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         serializer.save(author=self.request.user,
                         title=title)
 
@@ -91,11 +87,8 @@ class CommentViewSet(viewsets.ModelViewSet):
             review_id=self.kwargs['review_id'])
 
     def perform_create(self, serializer):
-        try:
-            title = Title.objects.get(id=self.kwargs['title_id'])
-            review = Review.objects.get(id=self.kwargs['review_id'])
-        except ObjectDoesNotExist as er:
-            raise NotFound(f'такого объекта не существует! Ошибка {er}')
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
+        review = get_object_or_404(Review, id=self.kwargs['review_id'])
         serializer.save(author=self.request.user,
                         title=title,
                         review=review)
