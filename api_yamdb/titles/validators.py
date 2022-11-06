@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def year_validator(year):
-    if datetime.now().year <= year:
+    if year > datetime.now().year:
         raise ValidationError(
-            _('Year of film must be correct.')
+            _('Year must be smaller than current one.')
         )
