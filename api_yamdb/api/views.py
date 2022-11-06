@@ -1,12 +1,10 @@
 from django.db.models import Avg
-from django.core.exceptions import ObjectDoesNotExist
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
-from rest_framework.exceptions import NotFound
 from users.permissions import (ReviewsAndCommentsRoutePermission,
                                TitleRoutePermission)
 from .filters import TitleFilter
